@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gjj.govcombackend.mapper.WorkOrderLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.gjj.govcombackend.model.entity.WorkOrderLog">
+            <id property="id" column="id" />
+            <result property="orderId" column="orderId" />
+            <result property="operator" column="operator" />
+            <result property="operatorId" column="operatorId" />
+            <result property="action" column="action" />
+            <result property="fromStatus" column="fromStatus" />
+            <result property="toStatus" column="toStatus" />
+            <result property="remark" column="remark" />
+            <result property="createTime" column="createTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,orderId,operator,operatorId,action,fromStatus,
+        toStatus,remark,createTime
+    </sql>
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gjj.govcombackend.mapper.ServiceItemMapper">
+
+    <resultMap id="BaseResultMap" type="com.gjj.govcombackend.model.entity.ServiceItem">
+            <id property="id" column="id" />
+            <result property="categoryId" column="categoryId" />
+            <result property="serviceName" column="serviceName" />
+            <result property="serviceCode" column="serviceCode" />
+            <result property="briefDesc" column="briefDesc" />
+            <result property="icon" column="icon" />
+            <result property="materialList" column="materialList" />
+            <result property="processDesc" column="processDesc" />
+            <result property="baseInfo" column="baseInfo" />
+            <result property="viewCount" column="viewCount" />
+            <result property="applyCount" column="applyCount" />
+            <result property="status" column="status" />
+            <result property="createTime" column="createTime" />
+            <result property="updateTime" column="updateTime" />
+            <result property="isDeleted" column="isDeleted" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,categoryId,serviceName,serviceCode,briefDesc,icon,
+        materialList,processDesc,baseInfo,viewCount,applyCount,
+        status,createTime,updateTime,isDeleted
+    </sql>
+</mapper>
