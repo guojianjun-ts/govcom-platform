@@ -1,4 +1,4 @@
-<!-- src/pages/workOrder/CommunityWorkOrder.vue -->
+<!-- src/pages/workOrder/ComWorkOrder.vue -->
 <template>
   <div class="workorder-page">
     <div class="page-header">
@@ -47,7 +47,11 @@
       @change="handleTableChange"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'type'">
+        <template v-if="column.key === 'createTime'">
+          {{ formatDateTime(record.createTime) }}
+        </template>
+
+        <template v-else-if="column.key === 'type'">
           {{ record.typeName }}
         </template>
 
@@ -80,6 +84,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { getCommunityWorkOrdersUsingPost } from '@/api/workOrderController'
+import dayjs from 'dayjs'
 
 const router = useRouter()
 const loading = ref(false)
@@ -95,7 +100,7 @@ const columns = [
   { title: '申请人', dataIndex: 'applicantName', key: 'applicantName' },
   { title: '工单类型', key: 'type', width: 100 },
   { title: '标题', dataIndex: 'title', key: 'title', ellipsis: true },
-  { title: '提交时间', dataIndex: 'createTime', key: 'createTime', width: 150 },
+  { title: '提交时间', key: 'createTime', width: 150 },
   { title: '状态', key: 'status', width: 100 },
   { title: '操作', key: 'action', width: 150, fixed: 'right' }
 ]
@@ -120,7 +125,7 @@ const fetchOrders = async () => {
     const res = await getCommunityWorkOrdersUsingPost(params)
     if (res.code === 0) {
       orderList.value = res.data || []
-      pagination.value.total = orderList.value.length * 5 // 临时处理，实际应从后端返回 total
+      pagination.value.total = orderList.value.length * 5
     }
   } catch (error) {
     message.error('获取工单列表失败')
@@ -145,6 +150,11 @@ const handleTableChange = (pag: any) => {
   pagination.value.current = pag.current
   pagination.value.pageSize = pag.pageSize
   fetchOrders()
+}
+
+const formatDateTime = (dateStr: string) => {
+  if (!dateStr) return ''
+  return dayjs(dateStr).format('YYYY-MM-DD HH:mm')
 }
 
 const getStatusColor = (status: number) => {

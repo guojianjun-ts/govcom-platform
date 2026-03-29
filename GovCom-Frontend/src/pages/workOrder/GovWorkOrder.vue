@@ -35,7 +35,11 @@
       @change="handleTableChange"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'status'">
+        <template v-if="column.key === 'submitTime'">
+          {{ formatDateTime(record.submitTime) }}
+        </template>
+
+        <template v-else-if="column.key === 'status'">
           <a-tag :color="getStatusColor(record.status)">
             {{ record.statusText }}
           </a-tag>
@@ -64,6 +68,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { getGovWorkOrdersUsingPost } from '@/api/workOrderController'
+import dayjs from 'dayjs'
 
 const router = useRouter()
 const loading = ref(false)
@@ -73,7 +78,6 @@ const filters = reactive({
   status: undefined
 })
 
-// ✅ 修正列配置，匹配后端返回的字段
 const columns = [
   { title: '申请单号', dataIndex: 'applicationNo', key: 'applicationNo', width: 180 },
   { title: '服务名称', dataIndex: 'serviceName', key: 'serviceName' },
@@ -81,7 +85,7 @@ const columns = [
   { title: '申请人', dataIndex: 'applicantName', key: 'applicantName' },
   { title: '联系电话', dataIndex: 'applicantPhone', key: 'applicantPhone' },
   { title: '地区', dataIndex: 'region', key: 'region', width: 120 },
-  { title: '提交时间', dataIndex: 'submitTime', key: 'submitTime', width: 150 },
+  { title: '提交时间', key: 'submitTime', width: 150 },
   { title: '状态', key: 'status', width: 100 },
   { title: '操作', key: 'action', width: 150, fixed: 'right' }
 ]
@@ -129,6 +133,11 @@ const handleTableChange = (pag: any) => {
   pagination.value.current = pag.current
   pagination.value.pageSize = pag.pageSize
   fetchOrders()
+}
+
+const formatDateTime = (dateStr: string) => {
+  if (!dateStr) return ''
+  return dayjs(dateStr).format('YYYY-MM-DD HH:mm')
 }
 
 const getStatusColor = (status: number) => {

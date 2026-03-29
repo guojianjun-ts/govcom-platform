@@ -1,4 +1,4 @@
-<!-- src/pages/workOrder/WorkOrderProcess.vue -->
+<!-- src/pages/workOrder/ComWorkOrderProcess.vue -->
 <template>
   <div class="process-page">
     <a-button type="link" @click="goBack" class="back-btn">

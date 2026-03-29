@@ -1,4 +1,4 @@
-<!-- src/pages/workOrder/WorkOrderDetail.vue -->
+<!-- src/pages/workOrder/ComWorkOrderDetail.vue -->
 <template>
   <div class="detail-page">
     <!-- 返回按钮 -->

@@ -195,7 +195,7 @@ const router = createRouter({
     {
       path: '/workOrder/community',
       name: 'CommunityWorkOrder',
-      component: () => import('@/pages/workOrder/CommunityWorkOrder.vue'),
+      component: () => import('@/pages/workOrder/ComWorkOrder.vue'),
       meta: {
         layout: 'main',
         requiresAuth: true,
@@ -206,7 +206,7 @@ const router = createRouter({
     {
       path: '/workOrder/detail/:id',
       name: 'WorkOrderDetail',
-      component: () => import('@/pages/workOrder/WorkOrderDetail.vue'),
+      component: () => import('@/pages/workOrder/ComWorkOrderDetail.vue'),
       meta: {
         layout: 'main',
         requiresAuth: true,
@@ -217,7 +217,7 @@ const router = createRouter({
     {
       path: '/workOrder/process/:id',
       name: 'WorkOrderProcess',
-      component: () => import('@/pages/workOrder/WorkOrderProcess.vue'),
+      component: () => import('@/pages/workOrder/ComWorkOrderProcess.vue'),
       meta: {
         layout: 'main',
         requiresAuth: true,
