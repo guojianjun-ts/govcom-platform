@@ -1,7 +1,6 @@
 package com.gjj.govcombackend.service;
 
-import com.gjj.govcombackend.model.entity.ServiceCategory;
-import com.gjj.govcombackend.model.entity.ServiceApplication;
+import com.gjj.govcombackend.model.entity.GovServiceCategory;
 import com.gjj.govcombackend.model.dto.govservice.ServiceApplicationRequest;
 import com.gjj.govcombackend.model.vo.ServiceItemVO;
 import com.gjj.govcombackend.model.vo.ServiceApplicationVO;
@@ -14,7 +13,7 @@ public interface GovService {
     /**
      * 获取所有服务分类
      */
-    List<ServiceCategory> getCategoryList();
+    List<GovServiceCategory> getCategoryList();
 
     // ============== 服务事项相关 ==============
     /**

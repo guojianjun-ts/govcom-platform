@@ -14,7 +14,6 @@ import com.gjj.govcombackend.model.vo.GovServiceApplicationVO;
 import com.gjj.govcombackend.model.vo.WorkOrderVO;
 import com.gjj.govcombackend.service.WorkOrderBizService;
 import com.gjj.govcombackend.service.UserService;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,27 +50,6 @@ public class WorkOrderController {
         List<GovServiceApplicationVO> list = workOrderBizService.getGovWorkOrders(request);
         return ResultUtils.success(list);
     }
-
-    // ============== 社区工单 ==============
-
-    @PostMapping("/community/list")
-    @ApiOperation("获取社区工单列表")
-    @UserAuthCheck
-    public BaseResponse<List<WorkOrderVO>> getCommunityWorkOrders(
-            @RequestBody WorkOrderQueryRequest request,
-            HttpServletRequest httpRequest) {
-        if (request == null) {
-            request = new WorkOrderQueryRequest();
-        }
-
-        User loginUser = userService.getLoginUser(httpRequest);
-        if (loginUser.getUserType() != 3 && loginUser.getUserType() != 4) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权访问");
-        }
-        List<WorkOrderVO> list = workOrderBizService.getCommunityWorkOrders(request, loginUser);
-        return ResultUtils.success(list);
-    }
-
     // ============== 政务工单详情 ==============
 
     @GetMapping("/gov/detail/{id}")
@@ -89,20 +67,6 @@ public class WorkOrderController {
         }
 
         GovServiceApplicationVO vo = workOrderBizService.getGovWorkOrderDetail(id);
-        return ResultUtils.success(vo);
-    }
-
-    // ============== 工单详情 ==============
-
-    @GetMapping("/detail/{id}")
-    @ApiOperation("获取工单详情")
-    @UserAuthCheck
-    public BaseResponse<WorkOrderVO> getWorkOrderDetail(
-            @PathVariable Integer id,
-            HttpServletRequest httpRequest) {
-        ThrowUtils.throwIf(id == null, ErrorCode.PARAMS_ERROR);
-        User loginUser = userService.getLoginUser(httpRequest);
-        WorkOrderVO vo = workOrderBizService.getWorkOrderDetail(id, loginUser);
         return ResultUtils.success(vo);
     }
 
@@ -125,7 +89,43 @@ public class WorkOrderController {
         return ResultUtils.success(result);
     }
 
-    // ============== 处理工单 ==============
+    // ============== 社区工单 ==============
+
+    @PostMapping("/community/list")
+    @ApiOperation("获取社区工单列表")
+    @UserAuthCheck
+    public BaseResponse<List<WorkOrderVO>> getCommunityWorkOrders(
+            @RequestBody WorkOrderQueryRequest request,
+            HttpServletRequest httpRequest) {
+        if (request == null) {
+            request = new WorkOrderQueryRequest();
+        }
+
+        User loginUser = userService.getLoginUser(httpRequest);
+        if (loginUser.getUserType() != 3 && loginUser.getUserType() != 4) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权访问");
+        }
+        List<WorkOrderVO> list = workOrderBizService.getCommunityWorkOrders(request, loginUser);
+        return ResultUtils.success(list);
+    }
+
+
+
+    // ============== 社区工单详情 ==============
+
+    @GetMapping("/detail/{id}")
+    @ApiOperation("获取工单详情")
+    @UserAuthCheck
+    public BaseResponse<WorkOrderVO> getWorkOrderDetail(
+            @PathVariable Integer id,
+            HttpServletRequest httpRequest) {
+        ThrowUtils.throwIf(id == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(httpRequest);
+        WorkOrderVO vo = workOrderBizService.getWorkOrderDetail(id, loginUser);
+        return ResultUtils.success(vo);
+    }
+
+    // ============== 处理社区工单 ==============
 
     @PostMapping("/process")
     @ApiOperation("处理工单")

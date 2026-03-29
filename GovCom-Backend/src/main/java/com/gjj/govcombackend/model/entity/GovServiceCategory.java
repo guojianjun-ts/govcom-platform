@@ -7,12 +7,12 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 服务申请表
- * @TableName service_application
+ * 政府服务分类表
+ * @TableName service_category
  */
-@TableName(value ="service_application")
+@TableName(value ="gov_service_category")
 @Data
-public class ServiceApplication {
+public class GovServiceCategory {
     /**
      * 主键ID
      */
@@ -20,44 +20,29 @@ public class ServiceApplication {
     private Integer id;
 
     /**
-     * 申请单号
+     * 分类名称（如：医疗保障、社会保障）
      */
-    private String applicationNo;
+    private String categoryName;
 
     /**
-     * 用户ID
+     * 分类编码（如：medical、social）
      */
-    private Long userId;
+    private String categoryCode;
 
     /**
-     * 服务ID
+     * 图标名称（如：fa-heartbeat）
      */
-    private Integer serviceId;
+    private String icon;
 
     /**
-     * 地区（如：重庆市南岸区）
+     * 排序顺序
      */
-    private String region;
+    private Integer sortOrder;
 
     /**
-     * 申请人姓名
-     */
-    private String applicantName;
-
-    /**
-     * 联系电话
-     */
-    private String applicantPhone;
-
-    /**
-     * 状态：1-已提交，2-审核中，3-已完成，4-已驳回
+     * 状态：0-隐藏，1-显示
      */
     private Integer status;
-
-    /**
-     * 提交时间
-     */
-    private Date submitTime;
 
     /**
      * 创建时间

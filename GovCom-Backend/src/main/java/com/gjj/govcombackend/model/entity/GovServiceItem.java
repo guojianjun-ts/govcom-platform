@@ -7,12 +7,12 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 服务事项表
+ * 政府服务事项表
  * @TableName service_item
  */
-@TableName(value ="service_item")
+@TableName(value ="gov_service_item")
 @Data
-public class ServiceItem {
+public class GovServiceItem {
     /**
      * 主键ID
      */

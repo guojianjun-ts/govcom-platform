@@ -5,14 +5,13 @@ import com.gjj.govcombackend.common.BaseResponse;
 import com.gjj.govcombackend.common.ResultUtils;
 import com.gjj.govcombackend.exception.ErrorCode;
 import com.gjj.govcombackend.exception.ThrowUtils;
-import com.gjj.govcombackend.model.entity.ServiceCategory;
+import com.gjj.govcombackend.model.entity.GovServiceCategory;
 import com.gjj.govcombackend.model.entity.User;
 import com.gjj.govcombackend.model.dto.govservice.ServiceApplicationRequest;
 import com.gjj.govcombackend.model.vo.ServiceItemVO;
 import com.gjj.govcombackend.model.vo.ServiceApplicationVO;
 import com.gjj.govcombackend.service.GovService;
 import com.gjj.govcombackend.service.UserService;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,8 +33,8 @@ public class GovController {
 
     @GetMapping("/category/list")
     @ApiOperation("获取服务分类列表")
-    public BaseResponse<List<ServiceCategory>> getGovCategoryList() {
-        List<ServiceCategory> list = govService.getCategoryList();
+    public BaseResponse<List<GovServiceCategory>> getGovCategoryList() {
+        List<GovServiceCategory> list = govService.getCategoryList();
         return ResultUtils.success(list);
     }
 

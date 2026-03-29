@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gjj.govcombackend.exception.BusinessException;
 import com.gjj.govcombackend.exception.ErrorCode;
-import com.gjj.govcombackend.model.entity.ServiceCategory;
-import com.gjj.govcombackend.model.entity.ServiceItem;
-import com.gjj.govcombackend.model.entity.ServiceApplication;
+import com.gjj.govcombackend.model.entity.GovServiceCategory;
+import com.gjj.govcombackend.model.entity.GovServiceItem;
+import com.gjj.govcombackend.model.entity.GovServiceApplication;
 import com.gjj.govcombackend.model.dto.govservice.ServiceApplicationRequest;
 import com.gjj.govcombackend.model.vo.ServiceItemVO;
 import com.gjj.govcombackend.model.vo.ServiceApplicationVO;
@@ -42,8 +42,8 @@ public class GovServiceImpl implements GovService {
     // ============== 分类相关 ==============
 
     @Override
-    public List<ServiceCategory> getCategoryList() {
-        QueryWrapper<ServiceCategory> wrapper = new QueryWrapper<>();
+    public List<GovServiceCategory> getCategoryList() {
+        QueryWrapper<GovServiceCategory> wrapper = new QueryWrapper<>();
         wrapper.eq("status", 1)
                 .orderByAsc("sortOrder");
         return categoryService.list(wrapper);
@@ -57,13 +57,13 @@ public class GovServiceImpl implements GovService {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "分类ID不能为空");
         }
 
-        Page<ServiceItem> page = new Page<>(pageNum, pageSize);
-        QueryWrapper<ServiceItem> wrapper = new QueryWrapper<>();
+        Page<GovServiceItem> page = new Page<>(pageNum, pageSize);
+        QueryWrapper<GovServiceItem> wrapper = new QueryWrapper<>();
         wrapper.eq("categoryId", categoryId)
                 .eq("status", 1)
                 .orderByDesc("applyCount");
 
-        Page<ServiceItem> result = itemService.page(page, wrapper);
+        Page<GovServiceItem> result = itemService.page(page, wrapper);
 
         return result.getRecords().stream()
                 .map(this::convertToItemVO)
@@ -76,7 +76,7 @@ public class GovServiceImpl implements GovService {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "服务ID不能为空");
         }
 
-        ServiceItem item = itemService.getById(id);
+        GovServiceItem item = itemService.getById(id);
         if (item == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "服务不存在");
         }
@@ -94,14 +94,14 @@ public class GovServiceImpl implements GovService {
             return new ArrayList<>();
         }
 
-        QueryWrapper<ServiceItem> wrapper = new QueryWrapper<>();
+        QueryWrapper<GovServiceItem> wrapper = new QueryWrapper<>();
         wrapper.like("serviceName", keyword)
                 .or()
                 .like("briefDesc", keyword)
                 .eq("status", 1)
                 .orderByDesc("applyCount");
 
-        List<ServiceItem> list = itemService.list(wrapper);
+        List<GovServiceItem> list = itemService.list(wrapper);
 
         return list.stream()
                 .map(this::convertToItemVO)
@@ -110,12 +110,12 @@ public class GovServiceImpl implements GovService {
 
     @Override
     public List<ServiceItemVO> getHotServices() {
-        QueryWrapper<ServiceItem> wrapper = new QueryWrapper<>();
+        QueryWrapper<GovServiceItem> wrapper = new QueryWrapper<>();
         wrapper.eq("status", 1)
                 .orderByDesc("applyCount", "viewCount")
                 .last("LIMIT 8");
 
-        List<ServiceItem> list = itemService.list(wrapper);
+        List<GovServiceItem> list = itemService.list(wrapper);
 
         return list.stream()
                 .map(this::convertToItemVO)
@@ -138,8 +138,8 @@ public class GovServiceImpl implements GovService {
         }
 
         // 检查服务是否存在
-        ServiceItem serviceItem = itemService.getById(request.getServiceId());
-        if (serviceItem == null) {
+        GovServiceItem govServiceItem = itemService.getById(request.getServiceId());
+        if (govServiceItem == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "服务不存在");
         }
 
@@ -147,7 +147,7 @@ public class GovServiceImpl implements GovService {
         String applicationNo = generateApplicationNo();
 
         // 创建申请记录
-        ServiceApplication application = new ServiceApplication();
+        GovServiceApplication application = new GovServiceApplication();
         BeanUtils.copyProperties(request, application);
         application.setApplicationNo(applicationNo);
         application.setUserId(userId);
@@ -158,9 +158,9 @@ public class GovServiceImpl implements GovService {
         boolean saved = applicationService.save(application);
 
         if (saved) {
-            serviceItem.setApplyCount(serviceItem.getApplyCount() == null ?
-                    1 : serviceItem.getApplyCount() + 1);
-            itemService.updateById(serviceItem);
+            govServiceItem.setApplyCount(govServiceItem.getApplyCount() == null ?
+                    1 : govServiceItem.getApplyCount() + 1);
+            itemService.updateById(govServiceItem);
             log.info("服务申请成功 - 申请单号: {}, 用户ID: {}", applicationNo, userId);
         }
 
@@ -173,11 +173,11 @@ public class GovServiceImpl implements GovService {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "用户未登录");
         }
 
-        QueryWrapper<ServiceApplication> wrapper = new QueryWrapper<>();
+        QueryWrapper<GovServiceApplication> wrapper = new QueryWrapper<>();
         wrapper.eq("userId", userId)
                 .orderByDesc("createTime");
 
-        List<ServiceApplication> list = applicationService.list(wrapper);
+        List<GovServiceApplication> list = applicationService.list(wrapper);
 
         return list.stream()
                 .map(this::convertToApplicationVO)
@@ -193,7 +193,7 @@ public class GovServiceImpl implements GovService {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "用户未登录");
         }
 
-        ServiceApplication app = applicationService.getById(id);
+        GovServiceApplication app = applicationService.getById(id);
         if (app == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "申请记录不存在");
         }
@@ -211,7 +211,7 @@ public class GovServiceImpl implements GovService {
     /**
      * 将ServiceItem转换为VO
      */
-    private ServiceItemVO convertToItemVO(ServiceItem item) {
+    private ServiceItemVO convertToItemVO(GovServiceItem item) {
         if (item == null) {
             return null;
         }
@@ -238,7 +238,7 @@ public class GovServiceImpl implements GovService {
     /**
      * 将ServiceApplication转换为VO
      */
-    private ServiceApplicationVO convertToApplicationVO(ServiceApplication application) {
+    private ServiceApplicationVO convertToApplicationVO(GovServiceApplication application) {
         if (application == null) {
             return null;
         }
@@ -266,7 +266,7 @@ public class GovServiceImpl implements GovService {
 
         // 查询服务名称和图标
         if (application.getServiceId() != null) {
-            ServiceItem item = itemService.getById(application.getServiceId());
+            GovServiceItem item = itemService.getById(application.getServiceId());
             if (item != null) {
                 vo.setServiceName(item.getServiceName());
                 vo.setServiceIcon(item.getIcon());

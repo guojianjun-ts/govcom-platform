@@ -1,6 +1,6 @@
 package com.gjj.govcombackend.service;
 
-import com.gjj.govcombackend.model.entity.ServiceCategory;
+import com.gjj.govcombackend.model.entity.GovServiceCategory;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -8,6 +8,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @description 针对表【service_category(服务分类表)】的数据库操作Service
 * @createDate 2026-03-12 19:16:17
 */
-public interface ServiceCategoryService extends IService<ServiceCategory> {
+public interface ServiceCategoryService extends IService<GovServiceCategory> {
 
 }

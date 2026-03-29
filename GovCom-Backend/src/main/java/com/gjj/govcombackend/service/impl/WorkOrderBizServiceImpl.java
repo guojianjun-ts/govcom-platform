@@ -46,9 +46,6 @@ public class WorkOrderBizServiceImpl implements WorkOrderBizService {
     @Resource
     private WorkOrderLogService workOrderLogService;
 
-    @Resource
-    private UserCommunityService userCommunityService;  // 用于获取用户所属社区
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Integer submitProof(ProofApplyRequest request, Long userId) {
@@ -217,7 +214,7 @@ public class WorkOrderBizServiceImpl implements WorkOrderBizService {
 
     @Override
     public GovServiceApplicationVO getGovWorkOrderDetail(Integer id) {
-        ServiceApplication application = serviceApplicationService.getById(id);
+        GovServiceApplication application = serviceApplicationService.getById(id);
         if (application == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "工单不存在");
         }
@@ -267,15 +264,15 @@ public class WorkOrderBizServiceImpl implements WorkOrderBizService {
 
     @Override
     public List<GovServiceApplicationVO> getGovWorkOrders(WorkOrderQueryRequest request) {
-        Page<ServiceApplication> page = new Page<>(request.getPageNum(), request.getPageSize());
-        QueryWrapper<ServiceApplication> wrapper = new QueryWrapper<>();
+        Page<GovServiceApplication> page = new Page<>(request.getPageNum(), request.getPageSize());
+        QueryWrapper<GovServiceApplication> wrapper = new QueryWrapper<>();
 
         if (request.getStatus() != null) {
             wrapper.eq("status", request.getStatus());
         }
         wrapper.orderByDesc("createTime");
 
-        Page<ServiceApplication> result = serviceApplicationService.page(page, wrapper);
+        Page<GovServiceApplication> result = serviceApplicationService.page(page, wrapper);
 
         return result.getRecords().stream()
                 .map(this::convertToGovVO)
@@ -285,7 +282,7 @@ public class WorkOrderBizServiceImpl implements WorkOrderBizService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean processGovWorkOrder(GovWorkOrderProcessRequest request) {
-        ServiceApplication application = serviceApplicationService.getById(request.getId());
+        GovServiceApplication application = serviceApplicationService.getById(request.getId());
         if (application == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "工单不存在");
         }
@@ -393,7 +390,7 @@ public class WorkOrderBizServiceImpl implements WorkOrderBizService {
     }
 
     // 转换方法
-    private GovServiceApplicationVO convertToGovVO(ServiceApplication application) {
+    private GovServiceApplicationVO convertToGovVO(GovServiceApplication application) {
         GovServiceApplicationVO vo = new GovServiceApplicationVO();
         BeanUtils.copyProperties(application, vo);
 
@@ -417,14 +414,14 @@ public class WorkOrderBizServiceImpl implements WorkOrderBizService {
 
         // 查询服务名称和分类
         if (application.getServiceId() != null) {
-            ServiceItem serviceItem = serviceItemService.getById(application.getServiceId());
-            if (serviceItem != null) {
-                vo.setServiceName(serviceItem.getServiceName());
-                vo.setServiceType(serviceItem.getServiceCode());
+            GovServiceItem govServiceItem = serviceItemService.getById(application.getServiceId());
+            if (govServiceItem != null) {
+                vo.setServiceName(govServiceItem.getServiceName());
+                vo.setServiceType(govServiceItem.getServiceCode());
 
                 // 查询分类名称
-                if (serviceItem.getCategoryId() != null) {
-                    InfoCategory category = infoCategoryService.getById(serviceItem.getCategoryId());
+                if (govServiceItem.getCategoryId() != null) {
+                    InfoCategory category = infoCategoryService.getById(govServiceItem.getCategoryId());
                     if (category != null) {
                         vo.setCategoryName(category.getCategoryName());
                     }

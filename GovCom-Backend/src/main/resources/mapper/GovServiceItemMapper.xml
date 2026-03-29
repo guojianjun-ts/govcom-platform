@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.gjj.govcombackend.mapper.ServiceItemMapper">
+<mapper namespace="com.gjj.govcombackend.mapper.GovServiceItemMapper">
 
-    <resultMap id="BaseResultMap" type="com.gjj.govcombackend.model.entity.ServiceItem">
+    <resultMap id="BaseResultMap" type="com.gjj.govcombackend.model.entity.GovServiceItem">
             <id property="id" column="id" />
             <result property="categoryId" column="categoryId" />
             <result property="serviceName" column="serviceName" />

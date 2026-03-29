@@ -1,9 +1,9 @@
 package com.gjj.govcombackend.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gjj.govcombackend.model.entity.ServiceApplication;
+import com.gjj.govcombackend.model.entity.GovServiceApplication;
 import com.gjj.govcombackend.service.ServiceApplicationService;
-import com.gjj.govcombackend.mapper.ServiceApplicationMapper;
+import com.gjj.govcombackend.mapper.GovServiceApplicationMapper;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 * @createDate 2026-03-12 19:21:49
 */
 @Service
-public class ServiceApplicationServiceImpl extends ServiceImpl<ServiceApplicationMapper, ServiceApplication>
+public class ServiceApplicationServiceImpl extends ServiceImpl<GovServiceApplicationMapper, GovServiceApplication>
     implements ServiceApplicationService {
 
 }

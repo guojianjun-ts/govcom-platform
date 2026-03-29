@@ -10,7 +10,7 @@ import lombok.Data;
  * 工单主表
  * @TableName work_order
  */
-@TableName(value ="work_order")
+@TableName(value ="com_work_order")
 @Data
 public class WorkOrder {
     /**
