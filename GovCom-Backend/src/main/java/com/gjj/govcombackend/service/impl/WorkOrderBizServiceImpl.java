@@ -9,16 +9,12 @@ import com.gjj.govcombackend.model.dto.life.ProofApplyRequest;
 import com.gjj.govcombackend.model.dto.life.HelpApplyRequest;
 import com.gjj.govcombackend.model.dto.life.ComplaintApplyRequest;
 import com.gjj.govcombackend.model.dto.life.WorkOrderQueryRequest;
+import com.gjj.govcombackend.model.dto.workOrder.GovWorkOrderProcessRequest;
 import com.gjj.govcombackend.model.dto.workOrder.WorkOrderProcessRequest;
-import com.gjj.govcombackend.model.entity.User;
-import com.gjj.govcombackend.model.entity.UserCommunity;
-import com.gjj.govcombackend.model.entity.WorkOrder;
-import com.gjj.govcombackend.model.entity.WorkOrderLog;
+import com.gjj.govcombackend.model.entity.*;
+import com.gjj.govcombackend.model.vo.GovServiceApplicationVO;
 import com.gjj.govcombackend.model.vo.WorkOrderVO;
-import com.gjj.govcombackend.service.UserCommunityService;
-import com.gjj.govcombackend.service.WorkOrderBizService;
-import com.gjj.govcombackend.service.WorkOrderService;
-import com.gjj.govcombackend.service.WorkOrderLogService;
+import com.gjj.govcombackend.service.*;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +30,15 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class WorkOrderBizServiceImpl implements WorkOrderBizService {
+
+    @Resource
+    private ServiceApplicationService serviceApplicationService;
+
+    @Resource
+    private ServiceItemService serviceItemService;
+
+    @Resource
+    private InfoCategoryService infoCategoryService;
 
     @Resource
     private WorkOrderService workOrderService;
@@ -211,6 +216,15 @@ public class WorkOrderBizServiceImpl implements WorkOrderBizService {
     }
 
     @Override
+    public GovServiceApplicationVO getGovWorkOrderDetail(Integer id) {
+        ServiceApplication application = serviceApplicationService.getById(id);
+        if (application == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "工单不存在");
+        }
+        return convertToGovVO(application);
+    }
+
+    @Override
     public WorkOrderVO getOrderDetail(Integer id, Long userId) {
         if (id == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "工单ID不能为空");
@@ -250,6 +264,43 @@ public class WorkOrderBizServiceImpl implements WorkOrderBizService {
         Page<WorkOrder> result = workOrderService.page(page, wrapper);
         return result.getRecords().stream().map(this::convertToVO).collect(Collectors.toList());
     }
+
+    @Override
+    public List<GovServiceApplicationVO> getGovWorkOrders(WorkOrderQueryRequest request) {
+        Page<ServiceApplication> page = new Page<>(request.getPageNum(), request.getPageSize());
+        QueryWrapper<ServiceApplication> wrapper = new QueryWrapper<>();
+
+        if (request.getStatus() != null) {
+            wrapper.eq("status", request.getStatus());
+        }
+        wrapper.orderByDesc("createTime");
+
+        Page<ServiceApplication> result = serviceApplicationService.page(page, wrapper);
+
+        return result.getRecords().stream()
+                .map(this::convertToGovVO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean processGovWorkOrder(GovWorkOrderProcessRequest request) {
+        ServiceApplication application = serviceApplicationService.getById(request.getId());
+        if (application == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "工单不存在");
+        }
+
+        // 只更新状态，不记录处理人、处理时间、处理结果
+        application.setStatus(request.getStatus());
+
+        boolean updated = serviceApplicationService.updateById(application);
+        if (updated) {
+            log.info("政务工单状态更新成功 - 工单ID: {}, 新状态: {}", request.getId(), request.getStatus());
+        }
+
+        return updated;
+    }
+
 
     @Override
     public List<WorkOrderVO> getCommunityWorkOrders(WorkOrderQueryRequest request, User loginUser) {
@@ -340,6 +391,50 @@ public class WorkOrderBizServiceImpl implements WorkOrderBizService {
         log.setRemark(remark);
         workOrderLogService.save(log);
     }
+
+    // 转换方法
+    private GovServiceApplicationVO convertToGovVO(ServiceApplication application) {
+        GovServiceApplicationVO vo = new GovServiceApplicationVO();
+        BeanUtils.copyProperties(application, vo);
+
+        // 设置状态名称
+        switch (application.getStatus()) {
+            case 1:
+                vo.setStatusText("已提交");
+                break;
+            case 2:
+                vo.setStatusText("审核中");
+                break;
+            case 3:
+                vo.setStatusText("已完成");
+                break;
+            case 4:
+                vo.setStatusText("已驳回");
+                break;
+            default:
+                vo.setStatusText("未知");
+        }
+
+        // 查询服务名称和分类
+        if (application.getServiceId() != null) {
+            ServiceItem serviceItem = serviceItemService.getById(application.getServiceId());
+            if (serviceItem != null) {
+                vo.setServiceName(serviceItem.getServiceName());
+                vo.setServiceType(serviceItem.getServiceCode());
+
+                // 查询分类名称
+                if (serviceItem.getCategoryId() != null) {
+                    InfoCategory category = infoCategoryService.getById(serviceItem.getCategoryId());
+                    if (category != null) {
+                        vo.setCategoryName(category.getCategoryName());
+                    }
+                }
+            }
+        }
+
+        return vo;
+    }
+
 
     private WorkOrderVO convertToVO(WorkOrder order) {
         if (order == null) {

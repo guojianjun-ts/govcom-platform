@@ -7,8 +7,10 @@ import com.gjj.govcombackend.exception.BusinessException;
 import com.gjj.govcombackend.exception.ErrorCode;
 import com.gjj.govcombackend.exception.ThrowUtils;
 import com.gjj.govcombackend.model.dto.life.WorkOrderQueryRequest;
+import com.gjj.govcombackend.model.dto.workOrder.GovWorkOrderProcessRequest;
 import com.gjj.govcombackend.model.dto.workOrder.WorkOrderProcessRequest;
 import com.gjj.govcombackend.model.entity.User;
+import com.gjj.govcombackend.model.vo.GovServiceApplicationVO;
 import com.gjj.govcombackend.model.vo.WorkOrderVO;
 import com.gjj.govcombackend.service.WorkOrderBizService;
 import com.gjj.govcombackend.service.UserService;
@@ -35,7 +37,7 @@ public class WorkOrderController {
     @PostMapping("/gov/list")
     @ApiOperation("获取政务工单列表")
     @UserAuthCheck
-    public BaseResponse<List<WorkOrderVO>> getGovWorkOrders(
+    public BaseResponse<List<GovServiceApplicationVO>> getGovWorkOrders(
             @RequestBody WorkOrderQueryRequest request,
             HttpServletRequest httpRequest) {
         if (request == null) {
@@ -46,7 +48,7 @@ public class WorkOrderController {
         if (loginUser.getUserType() != 2 && loginUser.getUserType() != 4) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权访问");
         }
-        List<WorkOrderVO> list = workOrderBizService.getGovWorkOrders(request, loginUser);
+        List<GovServiceApplicationVO> list = workOrderBizService.getGovWorkOrders(request);
         return ResultUtils.success(list);
     }
 
@@ -70,6 +72,26 @@ public class WorkOrderController {
         return ResultUtils.success(list);
     }
 
+    // ============== 政务工单详情 ==============
+
+    @GetMapping("/gov/detail/{id}")
+    @ApiOperation("获取政务工单详情")
+    @UserAuthCheck
+    public BaseResponse<GovServiceApplicationVO> getGovWorkOrderDetail(
+            @PathVariable Integer id,
+            HttpServletRequest httpRequest) {
+        ThrowUtils.throwIf(id == null, ErrorCode.PARAMS_ERROR);
+
+        User loginUser = userService.getLoginUser(httpRequest);
+        // 只有政务人员和管理员能访问
+        if (loginUser.getUserType() != 2 && loginUser.getUserType() != 4) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权访问");
+        }
+
+        GovServiceApplicationVO vo = workOrderBizService.getGovWorkOrderDetail(id);
+        return ResultUtils.success(vo);
+    }
+
     // ============== 工单详情 ==============
 
     @GetMapping("/detail/{id}")
@@ -82,6 +104,25 @@ public class WorkOrderController {
         User loginUser = userService.getLoginUser(httpRequest);
         WorkOrderVO vo = workOrderBizService.getWorkOrderDetail(id, loginUser);
         return ResultUtils.success(vo);
+    }
+
+    // ============== 处理政务工单 ==============
+
+    @PostMapping("/gov/process")
+    @ApiOperation("处理政务工单")
+    @UserAuthCheck
+    public BaseResponse<Boolean> processGovWorkOrder(
+            @RequestBody GovWorkOrderProcessRequest request,
+            HttpServletRequest httpRequest) {
+        ThrowUtils.throwIf(request == null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(request.getId() == null, ErrorCode.PARAMS_ERROR, "工单ID不能为空");
+        ThrowUtils.throwIf(request.getStatus() == null ||
+                        (request.getStatus() != 3 && request.getStatus() != 4),
+                ErrorCode.PARAMS_ERROR, "处理状态不正确");
+
+        User loginUser = userService.getLoginUser(httpRequest);
+        boolean result = workOrderBizService.processGovWorkOrder(request);
+        return ResultUtils.success(result);
     }
 
     // ============== 处理工单 ==============
