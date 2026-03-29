@@ -3,7 +3,7 @@
   <a-layout class="layout">
     <a-layout-header class="header">
       <div class="logo">
-        <span class="logo-text">普渝惠生</span>
+        <span class="logo-text">政府社区服务一体化创新平台</span>
       </div>
 
       <!-- 主导航菜单 - 根据用户类型动态显示 -->

@@ -8,26 +8,14 @@
     <!-- 筛选栏 -->
     <div class="filter-bar">
       <a-select
-        v-model:value="filters.type"
-        placeholder="工单类型"
+        v-model:value="filters.status"
+        placeholder="工单状态"
         style="width: 150px"
         allow-clear
         @change="handleFilterChange"
       >
-        <a-select-option :value="1">社区证明</a-select-option>
-        <a-select-option :value="2">社区帮助</a-select-option>
-        <a-select-option :value="3">投诉建议</a-select-option>
-      </a-select>
-
-      <a-select
-        v-model:value="filters.status"
-        placeholder="工单状态"
-        style="width: 150px; margin-left: 16px"
-        allow-clear
-        @change="handleFilterChange"
-      >
         <a-select-option :value="1">待受理</a-select-option>
-        <a-select-option :value="2">处理中</a-select-option>
+        <a-select-option :value="2">审核中</a-select-option>
         <a-select-option :value="3">已完成</a-select-option>
         <a-select-option :value="4">已驳回</a-select-option>
       </a-select>
@@ -47,11 +35,7 @@
       @change="handleTableChange"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'type'">
-          {{ record.typeName }}
-        </template>
-
-        <template v-else-if="column.key === 'status'">
+        <template v-if="column.key === 'status'">
           <a-tag :color="getStatusColor(record.status)">
             {{ record.statusText }}
           </a-tag>
@@ -62,20 +46,12 @@
             查看详情
           </a-button>
           <a-button
-            v-if="record.status === 1"
-            type="link"
-            size="small"
-            @click="acceptOrder(record)"
-          >
-            受理
-          </a-button>
-          <a-button
-            v-if="record.status === 2"
+            v-if="record.status === 1 || record.status === 2"
             type="link"
             size="small"
             @click="processOrder(record)"
           >
-            处理
+            {{ record.status === 1 ? '受理' : '处理' }}
           </a-button>
         </template>
       </template>
@@ -94,16 +70,18 @@ const loading = ref(false)
 const orderList = ref<any[]>([])
 
 const filters = reactive({
-  type: undefined,
   status: undefined
 })
 
+// ✅ 修正列配置，匹配后端返回的字段
 const columns = [
-  { title: '工单编号', dataIndex: 'orderNo', key: 'orderNo', width: 180 },
+  { title: '申请单号', dataIndex: 'applicationNo', key: 'applicationNo', width: 180 },
+  { title: '服务名称', dataIndex: 'serviceName', key: 'serviceName' },
+  { title: '服务分类', dataIndex: 'categoryName', key: 'categoryName', width: 100 },
   { title: '申请人', dataIndex: 'applicantName', key: 'applicantName' },
-  { title: '工单类型', key: 'type', width: 100 },
-  { title: '标题', dataIndex: 'title', key: 'title', ellipsis: true },
-  { title: '提交时间', dataIndex: 'createTime', key: 'createTime', width: 150 },
+  { title: '联系电话', dataIndex: 'applicantPhone', key: 'applicantPhone' },
+  { title: '地区', dataIndex: 'region', key: 'region', width: 120 },
+  { title: '提交时间', dataIndex: 'submitTime', key: 'submitTime', width: 150 },
   { title: '状态', key: 'status', width: 100 },
   { title: '操作', key: 'action', width: 150, fixed: 'right' }
 ]
@@ -122,13 +100,12 @@ const fetchOrders = async () => {
     const params = {
       pageNum: pagination.value.current,
       pageSize: pagination.value.pageSize,
-      type: filters.type,
       status: filters.status
     }
     const res = await getGovWorkOrdersUsingPost(params)
     if (res.code === 0) {
       orderList.value = res.data || []
-      pagination.value.total = orderList.value.length * 5 // 临时处理，实际应从后端返回 total
+      pagination.value.total = orderList.value.length * 5
     }
   } catch (error) {
     message.error('获取工单列表失败')
@@ -143,7 +120,6 @@ const handleFilterChange = () => {
 }
 
 const resetFilters = () => {
-  filters.type = undefined
   filters.status = undefined
   pagination.value.current = 1
   fetchOrders()
@@ -166,16 +142,11 @@ const getStatusColor = (status: number) => {
 }
 
 const viewDetail = (id: number) => {
-  router.push(`/workOrder/detail/${id}`)
-}
-
-const acceptOrder = (order: any) => {
-  // 受理工单，跳转到处理页
-  router.push(`/workOrder/process/${order.id}`)
+  router.push(`/workOrder/gov/detail/${id}`)
 }
 
 const processOrder = (order: any) => {
-  router.push(`/workOrder/process/${order.id}`)
+  router.push(`/workOrder/gov/process/${order.id}`)
 }
 
 onMounted(() => {
