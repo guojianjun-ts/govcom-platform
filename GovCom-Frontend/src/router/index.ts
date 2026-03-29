@@ -179,6 +179,18 @@ const router = createRouter({
         roles: [2, 4]  // 政务人员和管理员
       }
     },
+    {
+      path: '/workOrder/gov/detail/:id',
+      name: 'GovWorkOrderDetail',
+      component: () => import('@/pages/workOrder/GovWorkOrderDetail.vue'),
+      meta: { layout: 'main', requiresAuth: true, roles: [2, 4] }
+    },
+    {
+      path: '/workOrder/gov/process/:id',
+      name: 'GovWorkOrderProcess',
+      component: () => import('@/pages/workOrder/GovWorkOrderProcess.vue'),
+      meta: { layout: 'main', requiresAuth: true, roles: [2, 4] }
+    },
     // 社区工单 - 社区人员和管理员
     {
       path: '/workOrder/community',

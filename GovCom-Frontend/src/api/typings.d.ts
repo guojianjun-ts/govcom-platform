@@ -17,6 +17,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseGovServiceApplicationVO_ = {
+    code?: number
+    data?: GovServiceApplicationVO
+    message?: string
+  }
+
   type BaseResponseInfoArticleVO_ = {
     code?: number
     data?: InfoArticleVO
@@ -44,6 +50,12 @@ declare namespace API {
   type BaseResponseListCommunityVO_ = {
     code?: number
     data?: CommunityVO[]
+    message?: string
+  }
+
+  type BaseResponseListGovServiceApplicationVO_ = {
+    code?: number
+    data?: GovServiceApplicationVO[]
     message?: string
   }
 
@@ -274,6 +286,11 @@ declare namespace API {
     id: number
   }
 
+  type getGovWorkOrderDetailUsingGETParams = {
+    /** id */
+    id: number
+  }
+
   type getMyComplaintsUsingGETParams = {
     /** pageNum */
     pageNum?: number
@@ -333,6 +350,42 @@ declare namespace API {
   type getWorkOrderDetailUsingGETParams = {
     /** id */
     id: number
+  }
+
+  type GovServiceApplicationVO = {
+    /** 申请人姓名 */
+    applicantName?: string
+    /** 联系电话 */
+    applicantPhone?: string
+    /** 申请单号 */
+    applicationNo?: string
+    /** 服务分类 */
+    categoryName?: string
+    /** 申请时间 */
+    createTime?: string
+    /** 申请ID */
+    id?: number
+    /** 地区 */
+    region?: string
+    /** 服务ID */
+    serviceId?: number
+    /** 服务名称 */
+    serviceName?: string
+    /** 服务类型 */
+    serviceType?: string
+    /** 状态：1-已提交 2-审核中 3-已完成 4-已驳回 */
+    status?: number
+    /** 状态中文描述 */
+    statusText?: string
+    /** 提交时间 */
+    submitTime?: string
+  }
+
+  type GovWorkOrderProcessRequest = {
+    /** 工单ID */
+    id?: number
+    /** 处理状态：3-已完成，4-已驳回 */
+    status?: number
   }
 
   type HelpApplyRequest = {
